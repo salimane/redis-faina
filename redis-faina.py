@@ -76,10 +76,12 @@ class StatCounter(object):
     def _time_stats(self, times):
         sorted_times = self._get_or_sort_list(times)
         num_times = len(sorted_times)
-        percent_50 = sorted_times[int(num_times / 2)][0]
-        percent_75 = sorted_times[int(num_times * .75)][0]
-        percent_90 = sorted_times[int(num_times * .90)][0]
-        percent_99 = sorted_times[int(num_times * .99)][0]
+        percent_50 = percent_75 = percent_90 = percent_99 = 0
+        if num_times:
+            percent_50 = sorted_times[int(num_times / 2)][0]
+            percent_75 = sorted_times[int(num_times * .75)][0]
+            percent_90 = sorted_times[int(num_times * .90)][0]
+            percent_99 = sorted_times[int(num_times * .99)][0]
         return (("Median", percent_50),
                 ("75%", percent_75),
                 ("90%", percent_90),
@@ -99,7 +101,9 @@ class StatCounter(object):
         return printable_commands
 
     def _general_stats(self):
-        total_time = (self.last_ts - self.start_ts) / (1000*1000)
+        total_time = 1
+        if self.start_ts and self.last_ts:
+            total_time = (self.last_ts - self.start_ts) / (1000 * 1000)
         return (
             ("Lines Processed", self.line_count),
             ("Commands/Sec", '%.2f' % (self.line_count / total_time))
